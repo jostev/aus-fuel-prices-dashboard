@@ -1,11 +1,10 @@
-# app.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from fuel_api import fetch_fuel_data
 
 st.set_page_config(page_title="NSW Fuel Price Dashboard", layout="wide")
-st.title("⛽️ NSW Live Fuel Price Trends")
+st.title("️NSW Live Fuel Price Trends")
 
 # Sidebar controls
 st.sidebar.header("Filters")
@@ -13,7 +12,7 @@ fuel_type = st.sidebar.selectbox("Select Fuel Type", ["E10", "U91", "U95", "U98"
 brand_filter = st.sidebar.text_input("Filter by Brand (optional)")
 
 # Fetch data
-data = fetch_fuel_data(fuel_type=fuel_type)
+data = fetch_fuel_data()
 
 if data.empty:
     st.warning("No data available. Try again later.")
