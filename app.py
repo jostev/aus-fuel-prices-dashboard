@@ -1,42 +1,35 @@
-import streamlit as st
+# app.py
+from flask import Flask, render_template
+from fuel_api import FuelChecker
 import pandas as pd
-import plotly.express as px
-from fuel_api import fetch_fuel_data
 
-st.set_page_config(page_title="NSW Fuel Price Dashboard", layout="wide")
-st.title("️NSW Live Fuel Price Trends")
+app = Flask(__name__)
 
-# Sidebar controls
-st.sidebar.header("Filters")
-fuel_type = st.sidebar.selectbox("Select Fuel Type", ["E10", "U91", "U95", "U98", "Diesel", "LPG"])
-brand_filter = st.sidebar.text_input("Filter by Brand (optional)")
+@app.route('/')
+def index():
+    try:
+        checker = FuelChecker()
+        data = checker.fetch_fuel_prices()
 
-# Fetch data
-data = fetch_fuel_data()
+        records = data.get("stations", [])
+        df = pd.DataFrame.from_records(records)
 
-if data.empty:
-    st.warning("No data available. Try again later.")
-else:
-    if brand_filter:
-        data = data[data['brand'].str.contains(brand_filter, case=False, na=False)]
+        if df.empty:
+            return render_template("index.html", tables=[], error="No fuel data available.")
 
-    st.subheader(f"Showing {len(data)} stations with {fuel_type} prices")
+        df = df.rename(columns={
+            "brand": "Brand",
+            "address": "Address",
+            "price": "Price",
+            "lastUpdated": "Last Updated",
+            "latitude": "Latitude",
+            "longitude": "Longitude",
+        })
 
-    # Show table
-    st.dataframe(data[["brand", "address", "price", "last_updated"]].sort_values("price"))
+        return render_template("index.html", tables=[df.to_html(classes='data', header=True, index=False)], error=None)
 
-    # Plot
-    fig = px.scatter_mapbox(
-        data,
-        lat="lat",
-        lon="lng",
-        color="price",
-        size="price",
-        hover_name="brand",
-        hover_data=["address", "price"],
-        color_continuous_scale="Turbo",
-        zoom=8,
-        height=600
-    )
-    fig.update_layout(mapbox_style="open-street-map")
-    st.plotly_chart(fig, use_container_width=True)
+    except Exception as e:
+        return render_template("index.html", tables=[], error=str(e))
+
+if __name__ == '__main__':
+    app.run(debug=True)

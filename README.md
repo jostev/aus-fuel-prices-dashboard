@@ -1,13 +1,13 @@
 # Fuel Price Trends Dashboard (NSW)
 Real-time interactive dashboard for visualising fuel prices across New South Wales using the [NSW FuelCheckAPI](https://api.nsw.gov.au/Product/Index/22).
 
-Built with [Streamlit](https://streamlit.io/).
+Built with [Flask](https://pypi.org/project/Flask/).
 
 ## Features
 - Real-time API data (NSW FuelCheck)
 - Map-based visualisation
 - Brand and fuel-type filters
-- Clean UI with Streamlit
+- Clean UI with Flask
 
 ### 1. Clone the repo
 ```bash
@@ -34,7 +34,7 @@ FUELCHECK_API_KEY=your-api-key-here
 
 ### 4. Run the app
 ```bash
-streamlit run app.py
+flask run app.py
 ```
 ---
 
